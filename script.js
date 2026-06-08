@@ -11,8 +11,6 @@ const restartButton = document.getElementById('restartButton');
 const mobileControls = document.getElementById('mobileControls');
 const mobileButtons = Array.from(document.querySelectorAll('.control-pad'));
 const fullscreenButton = document.getElementById('fullscreenButton');
-const mobileJoystick = document.getElementById('mobileJoystick');
-const joystickHandle = document.getElementById('joystickHandle');
 const canvasShell = document.querySelector('.canvas-shell');
 const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
 
@@ -92,9 +90,6 @@ const mobileControlMap = {
 };
 
 let touchStart = null;
-let joystickPointerId = null;
-let joystickCenter = { x: 0, y: 0 };
-let joystickActive = false;
 
 function setDirection(direction) {
   if (!direction || !state.running) return;
@@ -792,54 +787,6 @@ function bindEvents() {
     touchStart = null;
   }, { passive: true });
 
-  if (mobileJoystick) {
-    mobileJoystick.addEventListener('pointerdown', handleJoystickStart);
-    window.addEventListener('pointermove', handleJoystickMove);
-    window.addEventListener('pointerup', handleJoystickEnd);
-    window.addEventListener('pointercancel', handleJoystickEnd);
-  }
-}
-
-function handleJoystickStart(event) {
-  if (!state.running) return;
-  joystickActive = true;
-  joystickPointerId = event.pointerId;
-  mobileJoystick.setPointerCapture(event.pointerId);
-  const rect = mobileJoystick.getBoundingClientRect();
-  joystickCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-  moveJoystickHandle(event.clientX, event.clientY);
-}
-
-function handleJoystickMove(event) {
-  if (!joystickActive || event.pointerId !== joystickPointerId) return;
-  moveJoystickHandle(event.clientX, event.clientY);
-}
-
-function handleJoystickEnd(event) {
-  if (!joystickActive || event.pointerId !== joystickPointerId) return;
-  joystickActive = false;
-  joystickPointerId = null;
-  joystickHandle.style.transform = 'translate(0, 0)';
-  mobileJoystick.releasePointerCapture(event.pointerId);
-}
-
-function moveJoystickHandle(x, y) {
-  const dx = x - joystickCenter.x;
-  const dy = y - joystickCenter.y;
-  const maxDistance = 42;
-  const distance = Math.min(Math.hypot(dx, dy), maxDistance);
-  const angle = Math.atan2(dy, dx);
-  const handleX = Math.cos(angle) * distance;
-  const handleY = Math.sin(angle) * distance;
-  joystickHandle.style.transform = `translate(${handleX}px, ${handleY}px)`;
-
-  const threshold = 16;
-  if (distance > threshold) {
-    const direction = Math.abs(handleX) > Math.abs(handleY)
-      ? (handleX > 0 ? controls.ArrowRight : controls.ArrowLeft)
-      : (handleY > 0 ? controls.ArrowDown : controls.ArrowUp);
-    setDirection(direction);
-  }
 }
 
 function enterFullscreen() {
