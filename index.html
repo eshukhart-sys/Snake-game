@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Garden</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <aside class="hud-panel">
+      <div class="brand-block">
+        <div class="brand-icon">🐍</div>
+        <div>
+          <h1>Snake Garden</h1>
+          <p>Живая премиальная змейка в волшебном поле.</p>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-value" id="score">0</span>
+          <span class="stat-label">Счёт</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="length">1</span>
+          <span class="stat-label">Длина</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="fill">0%</span>
+          <span class="stat-label">Захват</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="best">0</span>
+          <span class="stat-label">Рекорд</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="timer">00:00</span>
+          <span class="stat-label">Время</span>
+        </div>
+      </div>
+      <div class="controls-card">
+        <p>Управление: <strong>WASD</strong> / <strong>стрелки</strong></p>
+        <button id="restartButton" class="glass-button">Перезапустить</button>
+      </div>
+    </aside>
+    <main class="game-panel">
+      <div class="canvas-shell">
+        <canvas id="gameCanvas" width="896" height="896"></canvas>
+        <div id="overlayLayer" class="overlay-layer hidden">
+          <div class="overlay-card">
+            <h2 id="overlayTitle">Snake Garden</h2>
+            <p id="overlayMessage">Нажмите кнопку, чтобы начать.</p>
+            <button id="playButton" class="glass-button">Начать игру</button>
+            <div class="overlay-badges">
+              <div class="badge"><span id="overlayScore">0</span><small>Счёт</small></div>
+              <div class="badge"><span id="overlayLength">1</span><small>Длина</small></div>
+              <div class="badge"><span id="overlayTime">00:00</span><small>Время</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
