@@ -10,6 +10,8 @@ const playButton = document.getElementById('playButton');
 const restartButton = document.getElementById('restartButton');
 const mobileControls = document.getElementById('mobileControls');
 const mobileButtons = Array.from(document.querySelectorAll('.control-pad'));
+const fullscreenButton = document.getElementById('fullscreenButton');
+const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const CELL = 28;
 const COLS = canvas.width / CELL;
@@ -231,6 +233,9 @@ function startGame() {
   state.lastTime = performance.now();
   updateHUD();
   showOverlay('', '', false);
+  if (isMobileDevice) {
+    enterFullscreen().catch(() => {});
+  }
 }
 
 function endGame(won) {
@@ -734,6 +739,7 @@ function bindEvents() {
   window.addEventListener('resize', resizeCanvas);
   playButton.addEventListener('click', startGame);
   restartButton.addEventListener('click', startGame);
+  fullscreenButton.addEventListener('click', enterFullscreen);
 
   mobileButtons.forEach(button => {
     const direction = button.dataset.dir;
@@ -773,6 +779,13 @@ function bindEvents() {
     setDirection(direction);
     touchStart = null;
   }, { passive: true });
+}
+
+function enterFullscreen() {
+  if (canvas.requestFullscreen) return canvas.requestFullscreen();
+  if (canvas.webkitRequestFullscreen) return canvas.webkitRequestFullscreen();
+  if (canvas.msRequestFullscreen) return canvas.msRequestFullscreen();
+  return Promise.resolve();
 }
 
 function resizeCanvas() {

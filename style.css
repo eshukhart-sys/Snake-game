@@ -24,6 +24,7 @@ html {
 
 html, body {
   min-height: 100vh;
+  height: 100%;
 }
 
 body {
@@ -282,7 +283,9 @@ canvas {
   }
 
   .canvas-shell {
-    max-height: calc(100vh - 240px);
+    max-height: calc(100vh - 220px);
+    width: min(100vw, 100%);
+    height: min(calc(100vh - 220px), 100vw);
   }
 
   .mobile-controls {
@@ -297,11 +300,13 @@ canvas {
 @media (max-width: 720px) {
   .page-shell {
     gap: 16px;
-    padding: 14px 10px 12px;
+    padding: 12px 10px 10px;
   }
 
   .canvas-shell {
-    max-height: calc(100vh - 170px);
+    max-height: calc(100vh - 160px);
+    width: min(100vw, 100%);
+    height: min(calc(100vh - 160px), 100vw);
     border-radius: 28px;
   }
 
