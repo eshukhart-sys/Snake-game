@@ -8,6 +8,8 @@ const timerDisplay = document.getElementById('timer');
 const overlay = document.getElementById('overlayLayer');
 const playButton = document.getElementById('playButton');
 const restartButton = document.getElementById('restartButton');
+const mobileControls = document.getElementById('mobileControls');
+const mobileButtons = Array.from(document.querySelectorAll('.control-pad'));
 
 const CELL = 28;
 const COLS = canvas.width / CELL;
@@ -74,6 +76,24 @@ function formatTime(seconds) {
 
 function equalCells(a, b) {
   return a.x === b.x && a.y === b.y;
+}
+
+const mobileControlMap = {
+  up: controls.ArrowUp,
+  down: controls.ArrowDown,
+  left: controls.ArrowLeft,
+  right: controls.ArrowRight
+};
+
+let touchStart = null;
+
+function setDirection(direction) {
+  if (!direction || !state.running) return;
+  if (state.snake.turnLocked) return;
+  if (direction.x === -state.snake.direction.x && direction.y === -state.snake.direction.y) return;
+  if (direction.x === state.snake.direction.x && direction.y === state.snake.direction.y) return;
+  state.snake.nextDirection = direction;
+  state.snake.turnLocked = true;
 }
 
 function getRandomCell() {
@@ -706,20 +726,65 @@ function handleKey(event) {
     return;
   }
   if (!controls[event.code] || !state.running) return;
-  const direction = controls[event.code];
-  if (state.snake.turnLocked) return;
-  if (direction.x === -state.snake.direction.x && direction.y === -state.snake.direction.y) return;
-  state.snake.nextDirection = direction;
-  state.snake.turnLocked = true;
+  setDirection(controls[event.code]);
 }
 
 function bindEvents() {
   window.addEventListener('keydown', handleKey);
+  window.addEventListener('resize', resizeCanvas);
   playButton.addEventListener('click', startGame);
   restartButton.addEventListener('click', startGame);
+
+  mobileButtons.forEach(button => {
+    const direction = button.dataset.dir;
+    const target = mobileControlMap[direction];
+    button.addEventListener('click', () => setDirection(target));
+    button.addEventListener('touchstart', event => {
+      event.preventDefault();
+      setDirection(target);
+    }, { passive: false });
+  });
+
+  canvas.addEventListener('touchstart', event => {
+    if (!state.running) return;
+    const touch = event.changedTouches[0];
+    touchStart = { x: touch.clientX, y: touch.clientY };
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', event => {
+    if (!state.running) return;
+    event.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', event => {
+    if (!state.running || !touchStart) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - touchStart.x;
+    const dy = touch.clientY - touchStart.y;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    if (Math.max(absX, absY) < 24) {
+      touchStart = null;
+      return;
+    }
+    const direction = absX > absY
+      ? (dx > 0 ? controls.ArrowRight : controls.ArrowLeft)
+      : (dy > 0 ? controls.ArrowDown : controls.ArrowUp);
+    setDirection(direction);
+    touchStart = null;
+  }, { passive: true });
+}
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.floor(rect.width * dpr);
+  canvas.height = Math.floor(rect.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function initialize() {
+  resizeCanvas();
   initGame();
   updateHUD();
   showOverlay('Snake Garden', 'Нажмите кнопку или пробел для старта.', true, 0, 1, '00:00', 'Начать игру');
