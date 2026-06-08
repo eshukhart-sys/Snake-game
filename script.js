@@ -11,6 +11,7 @@ const restartButton = document.getElementById('restartButton');
 const mobileControls = document.getElementById('mobileControls');
 const mobileButtons = Array.from(document.querySelectorAll('.control-pad'));
 const fullscreenButton = document.getElementById('fullscreenButton');
+const canvasShell = document.querySelector('.canvas-shell');
 const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const CELL = 28;
@@ -737,6 +738,11 @@ function handleKey(event) {
 function bindEvents() {
   window.addEventListener('keydown', handleKey);
   window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', resizeCanvas);
+  document.addEventListener('fullscreenchange', resizeCanvas);
+  document.addEventListener('webkitfullscreenchange', resizeCanvas);
+  document.addEventListener('mozfullscreenchange', resizeCanvas);
+  document.addEventListener('MSFullscreenChange', resizeCanvas);
   playButton.addEventListener('click', startGame);
   restartButton.addEventListener('click', startGame);
   fullscreenButton.addEventListener('click', enterFullscreen);
@@ -782,9 +788,10 @@ function bindEvents() {
 }
 
 function enterFullscreen() {
-  if (canvas.requestFullscreen) return canvas.requestFullscreen();
-  if (canvas.webkitRequestFullscreen) return canvas.webkitRequestFullscreen();
-  if (canvas.msRequestFullscreen) return canvas.msRequestFullscreen();
+  const target = canvasShell || canvas;
+  if (target.requestFullscreen) return target.requestFullscreen();
+  if (target.webkitRequestFullscreen) return target.webkitRequestFullscreen();
+  if (target.msRequestFullscreen) return target.msRequestFullscreen();
   return Promise.resolve();
 }
 
