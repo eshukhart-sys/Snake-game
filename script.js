@@ -235,9 +235,6 @@ function startGame() {
   state.lastTime = performance.now();
   updateHUD();
   showOverlay('', '', false);
-  if (isMobileDevice) {
-    enterFullscreen().catch(() => {});
-  }
 }
 
 function endGame(won) {
@@ -798,17 +795,16 @@ function enterFullscreen() {
 }
 
 function resizeCanvas() {
-  if (isMobileDevice) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  if (rect.width <= 0 || rect.height <= 0) {
     canvas.width = BASE_CANVAS_SIZE;
     canvas.height = BASE_CANVAS_SIZE;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
   } else {
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(rect.width * dpr);
-    canvas.height = Math.floor(rect.height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
   }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function initialize() {
